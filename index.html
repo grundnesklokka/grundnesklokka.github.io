@@ -220,7 +220,7 @@
             <p>Du er invitert: <span id="original-time"></span></p>
             <p>Du bør faktisk ankomme: <span id="arrival-time"></span></p>
             <p class="time">Du bør dra: <span id="departure-time"></span></p>
-            <p class="explanation">Dette vil gjøre at du ankommer mellom 30 og 90 minutter forsinket - akkurat passe til å unngå kjedelig småprat før det skjer noe.</p>
+            <p id="expl" class="explanation">Dette vil gjøre at du ankommer mellom 30 og 90 minutter forsinket - akkurat passe til å unngå kjedelig småprat før det skjer noe.</p>
         </div>
     </div>
 
@@ -347,20 +347,6 @@
             
             if (selectElement.value) {
                 inputElement.value = selectElement.value;
-                
-                // Legg til husnummer manuelt der det er nødvendig
-                if (selectElement.options[selectElement.selectedIndex].text === "Konrad, Anton, Johan og Mari") {
-                    // Legg til husnummer etter at brukeren velger adressen
-                    setTimeout(() => {
-                        // Gi brukeren en melding om at de kanskje må spesifisere husnummeret
-                        alert("For Ingierkollveien, vennligst legg til husnummeret (41) manuelt hvis kartet ikke finner adressen.");
-                    }, 100);
-                }
-                else if (selectElement.options[selectElement.selectedIndex].text === "Lars, Håkon og Marit") {
-                    setTimeout(() => {
-                        alert("For Biskop Nils Jønssons gate, vennligst legg til husnummeret (22B) manuelt hvis kartet ikke finner adressen.");
-                    }, 100);
-                }
             }
         }
 
@@ -368,6 +354,8 @@
             // Hent input-verdier
             const eventDate = document.getElementById('event-date').value;
             const eventTime = document.getElementById('event-time').value;
+            const startPos = document.getElementById('start-location').value;
+            const endPos = document.getElementById('end-location').value;
             const travelTimeMinutes = parseInt(document.getElementById('travel-time').value);
             
             if (!eventDate || !eventTime) {
@@ -379,7 +367,17 @@
             const eventDateTime = new Date(`${eventDate}T${eventTime}`);
             
             // Generer tilfeldig forsinkelse (30-90 minutter)
-            const delayMinutes = Math.floor(Math.random() * (90 - 30 + 1)) + 30;
+            let delayMinutes;
+            
+            if (endPos === "Groruddalen Golfklubb, Oslo, Norge") {
+                delayMinutes = -30;
+                document.getElementById("expl").textContent = "Du burde starte litt ekstra tidlig hjemmefra. Da rekker du litt ekstra oppvarming og slipper kanskje unna noen husoppgaver."
+            } else if (startPos === "Solskinnsveien, Oslo, Norge") {
+                delayMinutes = Math.floor(Math.random() * (90 - 30 + 1)) + 60;
+                document.getElementById("expl").textContent = "Herfra virker det som man på magisk vis alltid har lagt inn en halvtime ekstra i tillegg til den vanlige grundnes tiden."
+            } else {
+                delayMinutes = Math.floor(Math.random() * (90 - 30 + 1)) + 30;
+            }
             
             // Beregn ankomsttid (med forsinkelse)
             const arrivalTime = new Date(eventDateTime);
