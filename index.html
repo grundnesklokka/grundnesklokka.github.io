@@ -369,12 +369,15 @@
             // Generer tilfeldig forsinkelse (30-90 minutter)
             let delayMinutes;
             
-            if (endPos === "Groruddalen Golfklubb, Oslo, Norge") {
+            if (endPos === "Rotnes Bruk, Norge") {
+                delayMinutes = 0;
+                document.getElementById("expl").textContent = "Hit er det greit å komme tidsnok."
+            } else if (endPos === "Groruddalen Golfklubb, Oslo, Norge") {
                 delayMinutes = -30;
                 document.getElementById("expl").textContent = "Du burde starte litt ekstra tidlig hjemmefra. Da rekker du litt ekstra oppvarming og slipper kanskje unna noen husoppgaver."
             } else if (startPos === "Solskinnsveien, Oslo, Norge") {
                 delayMinutes = Math.floor(Math.random() * (90 - 30 + 1)) + 60;
-                document.getElementById("expl").textContent = "Herfra virker det som man på magisk vis alltid har lagt inn en halvtime ekstra i tillegg til den vanlige grundnes tiden."
+                document.getElementById("expl").textContent = "Herfra er man alltid ekstra forsinket. Maten skal helst begynne å bli lunka."
             } else {
                 delayMinutes = Math.floor(Math.random() * (90 - 30 + 1)) + 30;
             }
