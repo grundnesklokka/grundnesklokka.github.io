@@ -3,430 +3,225 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grundnes-klokka</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+    <title>Hvor lenge til Oliver kommer?</title>
     <style>
-        body {
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f5f5f5;
-            color: #333;
-        }
-        h1 {
-            font-size: 28px;
-            margin-bottom: 20px;
-            color: #111;
-        }
-        .grundnes {
-            color: #ff4d8d;
-            font-size: 38px;
-            font-weight: bold;
-        }
-        .container {
-            background-color: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-        }
-        input, select {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 20px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 16px;
+        * {
+            margin: 0;
+            padding: 0;
             box-sizing: border-box;
         }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #333;
+            font-weight: 700;
+        }
+
+        .age-badge {
+            display: inline-block;
+            background: #FF4F00;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 25px;
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        .countdown-display {
+            background: #f8f8f8;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+
+        .time-display {
+            font-size: 4rem;
+            font-weight: 700;
+            color: #FF4F00;
+            margin: 20px 0;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .time-label {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .comment {
+            font-size: 1.3rem;
+            color: #444;
+            font-style: italic;
+            margin-top: 20px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
         button {
-            background-color: #ff4d8d;
+            background: #FF4F00;
             color: white;
             border: none;
-            padding: 12px 20px;
-            border-radius: 4px;
-            font-size: 16px;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            border-radius: 50px;
             cursor: pointer;
-            width: 100%;
-            transition: background-color 0.2s;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-top: 20px;
         }
+
         button:hover {
-            background-color: #ff2676;
+            background: #e64400;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 79, 0, 0.3);
         }
-        .result {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 90%;
-            max-width: 500px;
-            margin: 0;
-            padding: 30px;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
-            z-index: 1000;
-            display: none;
-            border-top: 5px solid #ff4d8d;
+
+        .refresh-info {
+            font-size: 0.9rem;
+            color: #999;
+            margin-top: 20px;
         }
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.5);
-            z-index: 999;
-            display: none;
-        }
-        .close-button {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            width: auto;
-            padding: 0;
-            color: #ff4d8d;
-        }
-        .close-button:hover {
-            color: #ff2676;
-            background: none;
-        }
-        .time {
-            font-size: 24px;
-            font-weight: bold;
-            margin: 10px 0;
-            color: #ff4d8d;
-        }
-        .explanation {
-            font-size: 14px;
-            color: #666;
-            margin-top: 15px;
-            border-top: 1px solid #f0f0f0;
-            padding-top: 15px;
-        }
-        #calculate-route {
-            background-color: #ff4d8d;
-            margin-bottom: 15px;
-        }
-        
-        #calculate-route:hover {
-            background-color: #ff2676;
-        }
-        
-        #map-container {
-            height: 300px;
-            margin: 20px 0;
-            border-radius: 8px;
-            border: 2px solid #ff4d8d;
-        }
-        .map-inputs {
-            display: flex;
-            gap: 10px;
-        }
-        .map-input {
-            flex: 1;
-        }
-        #directions-result {
-            margin-top: 10px;
-            font-size: 14px;
-        }
-        #duration-result {
-            margin-top: 5px;
-            font-weight: bold;
-        }
+
         .loading {
-            display: none;
-            text-align: center;
-            margin: 10px 0;
+            animation: pulse 1.5s ease-in-out infinite;
         }
-        .route-error {
-            color: #d9534f;
-            margin-top: 10px;
-            display: none;
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2rem;
+            }
+            .time-display {
+                font-size: 3rem;
+            }
+            .comment {
+                font-size: 1.1rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="overlay" id="overlay"></div>
     <div class="container">
-        <h1><span class="grundnes">Grundnes</span>-klokka</h1>
-        <p>Perfekt for deg som alltid kommer for tidlig. Fortell oss når du egentlig er invitert, så beregner vi når du bør dra for å være passende forsinket.</p>
+        <h1>Hvor lenge til Oliver kommer?</h1>
+        <div class="age-badge">70 år! 🎉</div>
         
-        <div class="input-section">
-            <label for="event-date">Dato:</label>
-            <input type="date" id="event-date">
-            
-            <label for="event-time">Tidspunkt du er invitert:</label>
-            <input type="time" id="event-time">
-            
-            <div id="map-section">
-                <label>Reiserute:</label>
-                <div class="map-inputs">
-                    <div style="flex: 1;">
-                        <input type="text" id="start-location" placeholder="Din startadresse" class="map-input">
-                        <select id="saved-start-locations" onchange="usePresetLocation('start')" style="width: 100%; margin-top: 5px;">
-                            <option value="">-- Velg lagret sted --</option>
-                            <option value="Monrads gate 13 B, 0564 Oslo, Norge">Hjemme</option>
-                            <option value="Solskinnsveien, Oslo, Norge">Svigerfar</option>
-                            <option value="Langhus, Norge">Langhus</option>
-                            <option value="Oslo Sentrum, Norge">Oslo Sentrum</option>
-                            <option value="Kolbotn, Norge">Kolbotn</option>
-                            <option value="Ski, Norge">Ski</option>
-                        </select>
-                    </div>
-                    <div style="flex: 1;">
-                        <input type="text" id="end-location" placeholder="Destinasjonsadresse" class="map-input">
-                        <select id="saved-end-locations" onchange="usePresetLocation('end')" style="width: 100%; margin-top: 5px;">
-                            <option value="">-- Velg lagret sted --</option>
-                            <option value="Solskinnsveien, Oslo, Norge">Svigerfar</option>
-                            <option value="Ingierkollveien, Kolbotn, Norge">Konrad, Anton, Johan og Mari</option>
-                            <option value="Etterstad, Oslo, Norge">Lars, Håkon og Marit</option>
-                            <option value="Rotnes Bruk, Norge">Bryllup</option>
-                            <option value="Oslo Spektrum, Norge">Oslo Spektrum</option>
-                            <option value="Ullevaal Stadion, Oslo, Norge">Ullevaal Stadion</option>
-                            <option value="Groruddalen Golfklubb, Oslo, Norge">Golfbanen</option>
-                        </select>
-                    </div>
-                </div>
-                <button id="calculate-route">Beregn reisetid</button>
-                <div id="loading" class="loading">Beregner rute...</div>
-                <div id="route-error" class="route-error"></div>
-                <div id="map-container"></div>
-                <div id="directions-result"></div>
-                <div id="duration-result"></div>
-            </div>
-            
-            <div id="manual-time" style="margin-top: 20px;">
-                <p>Eller angi reisetid manuelt:</p>
-                <label for="travel-time">Hvor lang tid tar det å komme dit? (minutter)</label>
-                <input type="number" id="travel-time" min="0" value="15">
-            </div>
-            
-            <button onclick="calculateDelayedTime()" style="margin-top: 20px;">Beregn når du bør dra</button>
+        <div class="countdown-display">
+            <div class="time-label">Oliver ankommer om:</div>
+            <div class="time-display" id="timeDisplay">--:--</div>
+            <div class="comment" id="comment"></div>
         </div>
         
-        <div class="result" id="result">
-            <button class="close-button" onclick="closeResult()">&times;</button>
-            <h2>Reiseplan</h2>
-            <p>Du er invitert: <span id="original-time"></span></p>
-            <p>Du bør faktisk ankomme: <span id="arrival-time"></span></p>
-            <p class="time">Du bør dra: <span id="departure-time"></span></p>
-            <p id="expl" class="explanation">Dette vil gjøre at du ankommer mellom 30 og 90 minutter forsinket - akkurat passe til å unngå kjedelig småprat før det skjer noe.</p>
+        <button onclick="updateTime()">Sjekk på nytt</button>
+        
+        <div class="refresh-info">
+            Tiden oppdateres automatisk hvert 30. sekund
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-routing-machine/3.2.12/leaflet-routing-machine.min.js"></script>
     <script>
-        let map, routingControl;
-        let calculatedTravelTime = 15; // Standard verdi
-        
-        // Initialiser kartet når siden er lastet
-        document.addEventListener('DOMContentLoaded', function() {
-            // Opprett kartet
-            map = L.map('map-container').setView([59.9139, 10.7522], 10); // Oslo som standard
-            
-            // Legg til kartlag fra OpenStreetMap
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(map);
-            
-            // Legg til hendelseslytter for ruteberegning
-            document.getElementById("calculate-route").addEventListener("click", calculateRoute);
-        });
-        
-        // Konverter adresse til koordinater
-        async function geocodeAddress(address) {
-            try {
-                const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`);
-                const data = await response.json();
-                
-                if (data && data.length > 0) {
-                    return [parseFloat(data[0].lat), parseFloat(data[0].lon)];
-                } else {
-                    throw new Error("Kunne ikke finne adressen");
-                }
-            } catch (error) {
-                console.error("Geocoding error:", error);
-                throw error;
-            }
-        }
-        
-        // Beregn rute mellom to steder
-        async function calculateRoute() {
-            const start = document.getElementById("start-location").value;
-            const end = document.getElementById("end-location").value;
-            
-            if (!start || !end) {
-                alert("Du må angi både start- og sluttadresse!");
-                return;
-            }
-            
-            // Vis laster-indikator
-            document.getElementById("loading").style.display = "block";
-            document.getElementById("route-error").style.display = "none";
-            
-            try {
-                // Konverter adresser til koordinater
-                const startCoords = await geocodeAddress(start);
-                const endCoords = await geocodeAddress(end);
-                
-                // Fjern eksisterende rute hvis den finnes
-                if (routingControl) {
-                    map.removeControl(routingControl);
-                }
-                
-                // Opprett ny rute
-                routingControl = L.Routing.control({
-                    waypoints: [
-                        L.latLng(startCoords[0], startCoords[1]),
-                        L.latLng(endCoords[0], endCoords[1])
-                    ],
-                    routeWhileDragging: false,
-                    show: false, // Ikke vis rutepanelet
-                    createMarker: function(i, waypoint, n) {
-                        const markerIcon = L.divIcon({
-                            html: i === 0 ? '<div style="background-color:#111; width:12px; height:12px; border-radius:50%; border:2px solid white;"></div>' : 
-                                           '<div style="background-color:#d9534f; width:12px; height:12px; border-radius:50%; border:2px solid white;"></div>',
-                            className: 'leaflet-div-icon',
-                            iconSize: [20, 20],
-                            iconAnchor: [10, 10]
-                        });
-                        return L.marker(waypoint.latLng, { icon: markerIcon });
-                    }
-                }).addTo(map);
-                
-                // Vent på at ruten skal beregnes
-                routingControl.on('routesfound', function(e) {
-                    const routes = e.routes;
-                    const summary = routes[0].summary;
-                    
-                    // Få reisetid i minutter
-                    calculatedTravelTime = Math.ceil(summary.totalTime / 60);
-                    
-                    // Oppdater UI
-                    document.getElementById("directions-result").innerHTML = 
-                        `Avstand: ${(summary.totalDistance / 1000).toFixed(1)} km`;
-                    document.getElementById("duration-result").innerHTML = 
-                        `Reisetid: ${Math.floor(summary.totalTime / 60)} minutter`;
-                    
-                    // Sett reisetid i input-feltet
-                    document.getElementById("travel-time").value = calculatedTravelTime;
-                    
-                    // Skjul laster
-                    document.getElementById("loading").style.display = "none";
-                });
-                
-                // Håndter feil
-                routingControl.on('routingerror', function(e) {
-                    document.getElementById("loading").style.display = "none";
-                    document.getElementById("route-error").style.display = "block";
-                    document.getElementById("route-error").textContent = "Kunne ikke beregne rute: " + e.error.message;
-                });
-                
-            } catch (error) {
-                document.getElementById("loading").style.display = "none";
-                document.getElementById("route-error").style.display = "block";
-                document.getElementById("route-error").textContent = "Kunne ikke finne adresse: " + error.message;
-            }
+        const comments = [
+            "Den som venter på noe godt, venter ikke forgjeves",
+            "Oliver-tid er en fleksibel størrelse",
+            "Klokka går, men Oliver tar sin tid",
+            "Punktlighet er tyveriet av andres tid - Oliver er ingen tyv",
+            "Bedre sent enn aldri, men aldri sent er bedre",
+            "Oliver kommer når Oliver kommer",
+            "Tålmodighet er en dyd - spesielt når man venter på Oliver",
+            "Einstein sa tiden er relativ - Oliver tok ham på ordet",
+            "Noen er født punktlige, Oliver ble født til å ta det med ro",
+            "70 år ung og fortsatt ingen stress",
+            "Livet er for kort til å stresse - Oliver har forstått det",
+            "Grundnes-tid: Når klokka er mer et forslag enn en regel",
+            "Oliver har sin egen tidssone",
+            "Fashionably late siden 1954",
+            "Hvorfor stresse når man kan ta det rolig?",
+            "Oliver-standard: Ankomst er mer kunst enn vitenskap",
+            "Ro, orden og Oliver-tid",
+            "Det haster ikke - Oliver kommer snart... ish",
+            "Kvalitet tar tid - Oliver tar litt ekstra",
+            "Venter du på Oliver? Da har du god tid",
+            "Oliver opererer på geologisk tid",
+            "Som et godt vin - Oliver blir bare bedre med tiden",
+            "Oliver kommer, bare vent litt til",
+            "Tidlig er on-time, on-time er sent, sent er Oliver",
+            "Klokka tikker, Oliver ikke",
+            "70 år og fortsatt ingen grunn til å skynde seg",
+            "Oliver-tid: Hvor minutter er veiledende",
+            "Sakte men sikkert - mest sakte",
+            "Det er ikke forsinkelse, det er dramaturgi",
+            "Oliver ankommer når stjernene står rett"
+        ];
+
+        function getRandomTime() {
+            return Math.floor(Math.random() * (97 - 5 + 1)) + 5;
         }
 
-        // Bruk forhåndslagret adresse
-        function usePresetLocation(type) {
-            const selectElement = document.getElementById(`saved-${type}-locations`);
-            const inputElement = document.getElementById(`${type}-location`);
-            
-            if (selectElement.value) {
-                inputElement.value = selectElement.value;
-            }
+        function getRandomComment() {
+            return comments[Math.floor(Math.random() * comments.length)];
         }
 
-        function calculateDelayedTime() {
-            // Hent input-verdier
-            const eventDate = document.getElementById('event-date').value;
-            const eventTime = document.getElementById('event-time').value;
-            const startPos = document.getElementById('start-location').value;
-            const endPos = document.getElementById('end-location').value;
-            const travelTimeMinutes = parseInt(document.getElementById('travel-time').value);
+        function formatTime(minutes) {
+            const hours = Math.floor(minutes / 60);
+            const mins = minutes % 60;
             
-            if (!eventDate || !eventTime) {
-                alert('Du må fylle inn både dato og tidspunkt!');
-                return;
-            }
-            
-            // Kombiner dato og tid
-            const eventDateTime = new Date(`${eventDate}T${eventTime}`);
-            
-            // Generer tilfeldig forsinkelse (30-90 minutter)
-            let delayMinutes;
-            
-            if (endPos === "Rotnes Bruk, Norge") {
-                delayMinutes = 0;
-                document.getElementById("expl").textContent = "Hit er det greit å komme tidsnok."
-            } else if (endPos === "Groruddalen Golfklubb, Oslo, Norge") {
-                delayMinutes = -30;
-                document.getElementById("expl").textContent = "Du burde starte litt ekstra tidlig hjemmefra. Da rekker du litt ekstra oppvarming og slipper kanskje unna noen husoppgaver."
-            } else if (startPos === "Solskinnsveien, Oslo, Norge") {
-                delayMinutes = Math.floor(Math.random() * (90 - 30 + 1)) + 60;
-                document.getElementById("expl").textContent = "Herfra er man alltid ekstra forsinket. Maten skal helst begynne å bli lunka."
+            if (hours > 0) {
+                return `${hours}:${mins.toString().padStart(2, '0')}`;
             } else {
-                delayMinutes = Math.floor(Math.random() * (90 - 30 + 1)) + 30;
+                return `${mins} min`;
             }
-            
-            // Beregn ankomsttid (med forsinkelse)
-            const arrivalTime = new Date(eventDateTime);
-            arrivalTime.setMinutes(arrivalTime.getMinutes() + delayMinutes);
-            
-            // Beregn avgangstid (ankomsttid minus reisetid)
-            const departureTime = new Date(arrivalTime);
-            departureTime.setMinutes(departureTime.getMinutes() - travelTimeMinutes);
-            
-            // Vis resultatet
-            document.getElementById('original-time').textContent = formatDateTime(eventDateTime);
-            document.getElementById('arrival-time').textContent = formatDateTime(arrivalTime) + 
-                ` (${delayMinutes} min forsinket)`;
-            document.getElementById('departure-time').textContent = formatDateTime(departureTime);
-            
-            // Vis overlay og resultat
-            document.getElementById('overlay').style.display = 'block';
-            document.getElementById('result').style.display = 'block';
         }
-        
-        // Lukk resultatet
-        function closeResult() {
-            document.getElementById('overlay').style.display = 'none';
-            document.getElementById('result').style.display = 'none';
+
+        function updateTime() {
+            const timeDisplay = document.getElementById('timeDisplay');
+            const commentDisplay = document.getElementById('comment');
+            
+            // Add loading animation
+            timeDisplay.classList.add('loading');
+            
+            setTimeout(() => {
+                const minutes = getRandomTime();
+                timeDisplay.textContent = formatTime(minutes);
+                commentDisplay.textContent = `"${getRandomComment()}"`;
+                timeDisplay.classList.remove('loading');
+            }, 300);
         }
-        
-        // Lukk resultatet når brukeren klikker på overlayet
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('overlay').addEventListener('click', function(e) {
-                if (e.target === this) {
-                    closeResult();
-                }
-            });
-        });
-        
-        function formatDateTime(date) {
-            const options = { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            };
-            return date.toLocaleDateString('no-NO', options);
-        }
+
+        // Initial update
+        updateTime();
+
+        // Auto-update every 30 seconds
+        setInterval(updateTime, 30000);
+
+        // Prevent context menu on mobile
+        document.addEventListener('contextmenu', e => e.preventDefault());
     </script>
 </body>
 </html>
